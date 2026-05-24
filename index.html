@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanasto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a092d;
+  --surface: #2e3856;
+  --surface-2: #3f4870;
+  --border: #3f4870;
+  --text: #ffffff;
+  --text-muted: #a8aabc;
+  --text-faint: #6b7596;
+  --primary: #4255ff;
+  --primary-hover: #5563ff;
+  --primary-soft: rgba(66, 85, 255, 0.22);
+  --success: #61c46c;
+  --success-soft: rgba(97, 196, 108, 0.18);
+  --error: #ff8169;
+  --error-soft: rgba(255, 129, 105, 0.18);
+  --warning: #ffcd1f;
+  --shadow-sm: 0 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo svg { width: 24px; height: 24px; }
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.crumb button {
+  background: none; border: none;
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.crumb button:hover { background: var(--surface-2); color: var(--text); }
+.crumb .sep { color: var(--text-faint); margin: 0 2px; }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* HOME */
+.home-hero { margin-bottom: 40px; }
+.home-hero h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+.home-hero p { color: var(--text-muted); font-size: 16px; }
+
+.sets-section h2 {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.sets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.set-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.set-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+.set-card .name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.set-card .desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+.set-card .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.set-card .count {
+  background: var(--surface-2);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.set-card .progress-bar {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+.set-card .progress-bar .fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.4s;
+}
+
+/* MODE SELECT */
+.mode-header { margin-bottom: 32px; }
+.mode-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 4px;
+}
+.mode-header .sub { color: var(--text-muted); font-size: 15px; }
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.mode-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mode-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+.mode-card .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+}
+.mode-card h3 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.mode-card p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* FLASHCARDS */
+.fc-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+}
+.fc-topbar {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.fc-pills {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.fc-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.fc-pill.dont { background: var(--error-soft); color: var(--error); }
+.fc-pill.know { background: var(--success-soft); color: var(--success); }
+
+.fc-progress {
+  width: 100%;
+  max-width: 720px;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.fc-progress .fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.4s;
+}
+
+.fc-card {
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 5 / 3;
+  perspective: 1500px;
+  cursor: pointer;
+  position: relative;
+}
+.fc-inner {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.fc-card.flipped .fc-inner { transform: rotateY(180deg); }
+.fc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+.fc-face.back { transform: rotateY(180deg); }
+.fc-label {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.fc-word {
+  font-size: clamp(36px, 6vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--text);
+}
+.fc-hint {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  font-style: italic;
+}
+.fc-tap {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.fc-controls {
+  width: 100%;
+  max-width: 720px;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.fc-btn {
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border: 2px solid;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--surface);
+}
+.fc-btn .key {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  opacity: 0.65;
+}
+.fc-btn .arrow {
+  font-size: 18px;
+  opacity: 0.8;
+}
+.fc-btn.dont { border-color: var(--error); color: var(--error); }
+.fc-btn.dont:hover { background: var(--error); color: white; }
+.fc-btn.know { border-color: var(--success); color: var(--success); }
+.fc-btn.know:hover { background: var(--success); color: white; }
+
+.fc-hints {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-faint);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.fc-hints kbd {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+/* LEARN MODE */
+.learn-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px;
+}
+.learn-topbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+.learn-counts {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.learn-count {
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.learn-count.learning { background: rgba(255, 205, 31, 0.18); color: var(--warning); }
+.learn-count.mastered { background: var(--success-soft); color: var(--success); }
+.learn-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  position: relative;
+}
+.learn-progress-bar .fill {
+  height: 100%;
+  background: var(--success);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.learn-progress-bar .fill-learning {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--warning);
+  border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  opacity: 0.85;
+}
+
+.learn-card {
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  box-shadow: var(--shadow-md);
+}
+.learn-lbl {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 16px;
+}
+.learn-term {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.learn-term-hint {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.learn-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 32px 0 24px;
+}
+.learn-choices-lbl {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.learn-choices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.learn-choice {
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+}
+.learn-choice:hover:not(.disabled) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.learn-choice .num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.learn-choice:hover:not(.disabled) .num { background: var(--primary); color: white; }
+.learn-choice.correct {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+}
+.learn-choice.correct .num { background: var(--success); color: white; }
+.learn-choice.wrong {
+  border-color: var(--error);
+  background: var(--error-soft);
+  color: var(--error);
+}
+.learn-choice.wrong .num { background: var(--error); color: white; }
+.learn-choice.disabled { cursor: default; opacity: 0.5; }
+.learn-choice.disabled.reveal {
+  border-color: var(--success);
+  background: var(--success-soft);
+  color: var(--success);
+  opacity: 1;
+}
+.learn-choice.disabled.reveal .num { background: var(--success); color: white; }
+
+.learn-input-row {
+  display: flex;
+  gap: 12px;
+}
+.learn-input {
+  flex: 1;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.learn-input:focus { border-color: var(--primary); }
+.learn-input.correct { border-color: var(--success); background: var(--success-soft); color: var(--success); }
+.learn-input.wrong { border-color: var(--error); background: var(--error-soft); color: var(--error); }
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 14px 24px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 0 var(--primary-hover);
+}
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-primary:active { box-shadow: none; transform: translateY(2px); }
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+.learn-feedback {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  display: none;
+}
+.learn-feedback.show { display: block; }
+.learn-feedback.right { background: var(--success-soft); color: var(--success); }
+.learn-feedback.wrong { background: var(--error-soft); color: var(--error); }
+.learn-feedback .verdict {
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.learn-feedback .correct-answer {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+.learn-feedback .your-answer {
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0.85;
+  color: var(--text-muted);
+}
+.learn-feedback .continue-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.dont-know-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px;
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+.dont-know-link:hover { color: var(--primary); text-decoration-color: var(--primary); }
+
+/* ROUND COMPLETE */
+.round-done {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.round-done .badge {
+  display: inline-block;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+.round-done h2 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+.round-done p { color: var(--text-muted); font-size: 16px; margin-bottom: 32px; }
+.round-done .stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.round-done .stat .num {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.round-done .stat .lbl {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.round-done .stat.learning .num { color: var(--warning); }
+.round-done .stat.mastered .num { color: var(--success); }
+.round-done .actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fade-in { animation: fadeIn 0.3s ease-out both; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: var(--text-faint);
+  font-weight: 500;
+}
+
+/* ADD SET */
+.add-set-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.add-set-btn {
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  box-shadow: 0 2px 0 var(--primary-hover);
+}
+.add-set-btn:hover { background: var(--primary-hover); }
+.add-set-btn:active { box-shadow: none; transform: translateY(2px); }
+.set-card.custom { border-style: dashed; }
+.set-card .badge-custom {
+  display: inline-block;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.set-card .delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  font-size: 18px;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.set-card .delete-btn:hover { background: var(--error-soft); color: var(--error); }
+.set-card { position: relative; }
+
+.add-set-wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  width: 100%;
+}
+.add-set-wrap h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 8px;
+}
+.add-set-wrap .lead {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+.format-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.format-card h3 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.format-card h3 .step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.format-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 12px; line-height: 1.55; }
+.format-card pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: 'SF Mono', Consolas, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+  overflow-x: auto;
+  white-space: pre;
+  position: relative;
+}
+.format-card .copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.format-card .copy-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
+.format-card .copy-btn.copied { background: var(--success); border-color: var(--success); color: white; }
+
+.paste-area {
+  width: 100%;
+  min-height: 280px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  font-family: 'SF Mono', Consolas, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.paste-area:focus { border-color: var(--primary); }
+.paste-error {
+  color: var(--error);
+  background: var(--error-soft);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 12px;
+  display: none;
+}
+.paste-error.show { display: block; }
+.paste-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.share-note {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-top: 20px;
+}
+.share-note strong { color: var(--text); }
+
+@media (max-width: 640px) {
+  header { padding: 12px 16px; }
+  main { padding: 20px 16px; }
+  .learn-choices { grid-template-columns: 1fr; }
+  .home-hero h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="4" width="14" height="14" rx="2"/><rect x="7" y="6" width="14" height="14" rx="2" opacity="0.45"/></svg>
+      Sanasto
+    </div>
+    <div class="crumb" id="crumb"></div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer>FI → EN · paikallinen opiskelu</footer>
+</div>
+
+<script src="vocab.js"></script>
+<script>
+const STORAGE_PREFIX = "sanasto_v2_";
+const CUSTOM_SETS_KEY = "sanasto_custom_sets_v1";
+let currentMode = null;
+let currentSet = null;
+
+function loadCustomSets() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_SETS_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+function saveCustomSets(arr) {
+  localStorage.setItem(CUSTOM_SETS_KEY, JSON.stringify(arr));
+}
+function getAllSets() {
+  const builtin = (window.VOCAB && window.VOCAB.sets) ? window.VOCAB.sets : [];
+  return [...builtin, ...loadCustomSets()];
+}
+
+function loadProgress(setId) {
+  try { const raw = localStorage.getItem(STORAGE_PREFIX + setId); return raw ? JSON.parse(raw) : {}; }
+  catch { return {}; }
+}
+function saveProgress(setId, data) {
+  localStorage.setItem(STORAGE_PREFIX + setId, JSON.stringify(data));
+}
+function getCardKey(card) { return card.fi + "::" + card.en; }
+
+function render(html) {
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.className = "fade-in";
+  wrap.style.flex = "1";
+  wrap.style.display = "flex";
+  wrap.style.flexDirection = "column";
+  wrap.innerHTML = html;
+  main.appendChild(wrap);
+}
+
+function setCrumb(parts) {
+  const el = document.getElementById("crumb");
+  el.innerHTML = parts.map(p =>
+    p.onClick ? `<button onclick="${p.onClick}">${p.label}</button>` : `<span>${p.label}</span>`
+  ).join('<span class="sep">/</span>');
+}
+
+function goHome() {
+  currentMode = null;
+  currentSet = null;
+  setCrumb([]);
+  renderHome();
+}
+
+function renderHome() {
+  const sets = getAllSets();
+  const setsHtml = sets.map(s => {
+    const progress = loadProgress(s.id);
+    const mastered = s.cards.filter(c => {
+      const p = progress[getCardKey(c)];
+      return p && p.bucket >= 2;
+    }).length;
+    const pct = s.cards.length ? Math.round((mastered / s.cards.length) * 100) : 0;
+    const isCustom = !!s.custom;
+    return `
+      <div class="set-card ${isCustom ? 'custom' : ''}" onclick="openSet('${s.id}')">
+        ${isCustom ? `<button class="delete-btn" onclick="event.stopPropagation(); deleteCustomSet('${s.id}')" title="Poista">×</button>` : ''}
+        <div class="name">${escapeHtml(s.name)}${isCustom ? '<span class="badge-custom">oma</span>' : ''}</div>
+        <div class="desc">${escapeHtml(s.description || ' ')}</div>
+        <div class="meta">
+          <span>${s.cards.length} termiä</span>
+          <span class="count">${pct}% hallittu</span>
+        </div>
+        <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join("");
+
+  render(`
+    <div class="home-hero">
+      <h1>Tervetuloa takaisin</h1>
+      <p>Valitse pakka aloittaaksesi.</p>
+    </div>
+    <div class="sets-section">
+      <div class="add-set-row">
+        <h2>Sanastot</h2>
+        <button class="add-set-btn" onclick="renderAddSet()">+ Lisää sanasto</button>
+      </div>
+      <div class="sets-grid">${setsHtml}</div>
+    </div>
+  `);
+}
+
+function openSet(setId) {
+  currentSet = getAllSets().find(s => s.id === setId);
+  if (!currentSet) return;
+  currentMode = null;
+  setCrumb([
+    { label: "Alkuun", onClick: "goHome()" },
+    { label: escapeHtml(currentSet.name) }
+  ]);
+  const progress = loadProgress(currentSet.id);
+  const hasProgress = Object.keys(progress).length > 0;
+  render(`
+    <div class="mode-header">
+      <h1>${escapeHtml(currentSet.name)}</h1>
+      <div class="sub">${currentSet.cards.length} termiä · valitse opiskelutila</div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startFlashcards()">
+        <div class="icon">⚡</div>
+        <h3>Flashcards</h3>
+        <p>Selaa kortteja, paljasta Spacella. Paina A (en osaa) tai D (osaan) — kortti siirtyy automaattisesti.</p>
+      </div>
+      <div class="mode-card" onclick="startLearn()">
+        <div class="icon">🎯</div>
+        <h3>Learn</h3>
+        <p>Aloita monivalinnalla, etene kirjoitustehtäviin. Toistaa vaikeita kunnes hallittu.</p>
+      </div>
+    </div>
+    ${hasProgress ? `
+      <div style="margin-top:32px;text-align:center">
+        <button class="btn-secondary" onclick="resetSetProgress('${currentSet.id}')">
+          Nollaa Learn-edistys
+        </button>
+      </div>
+    ` : ''}
+  `);
+}
+
+function resetSetProgress(setId) {
+  const set = getAllSets().find(s => s.id === setId);
+  if (!set) return;
+  if (!confirm("Nollataanko \"" + set.name + "\" Learn-edistys? Aloitat seuraavalla kerralla taas monivalinnoilla.")) return;
+  localStorage.removeItem(STORAGE_PREFIX + setId);
+  openSet(setId);
+}
+
+// ============ ADD CUSTOM SET ============
+const SAMPLE_SET = `Name: My new set
+Description: short summary (optional)
+
+# You can use # for comments / section headings
+fi term = en translation
+toinen sana = another word | optional hint
+kissa = cat
+koira = dog
+juosta = run | verb
+talo = house`;
+
+const CLAUDE_PROMPT = `Format this vocabulary into Sanasto paste format:
+
+- One pair per line: \`fi term = en translation\`
+- Optional hint after a pipe: \`fi = en | hint\`
+- Start with \`Name: ...\` and optional \`Description: ...\`
+- Use \`#\` for section headings (ignored by app)
+
+Vocabulary:
+<paste your raw vocab here>`;
+
+function renderAddSet() {
+  currentMode = null;
+  currentSet = null;
+  setCrumb([
+    { label: "Alkuun", onClick: "goHome()" },
+    { label: "Lisää sanasto" }
+  ]);
+  render(`
+    <div class="add-set-wrap">
+      <h1>Lisää uusi sanasto</h1>
+      <p class="lead">Liitä sanasto alle. Tallentuu tähän selaimeen (omat sanastot).</p>
+
+      <div class="format-card">
+        <h3><span class="step-num">1</span> Muoto</h3>
+        <p>Yksi sanapari per rivi, erotin <code>=</code>. Vihje pipe-merkin (<code>|</code>) jälkeen.</p>
+        <pre id="sample-block">${escapeHtml(SAMPLE_SET)}<button class="copy-btn" onclick="copyText('sample-block', this)">Kopioi</button></pre>
+      </div>
+
+      <div class="format-card">
+        <h3><span class="step-num">2</span> Pyydä Claudea muotoilemaan</h3>
+        <p>Jos sanastosi on järjestämätön, kopioi tämä kehote ja liitä raakasanasto perään:</p>
+        <pre id="prompt-block">${escapeHtml(CLAUDE_PROMPT)}<button class="copy-btn" onclick="copyText('prompt-block', this)">Kopioi</button></pre>
+      </div>
+
+      <div class="format-card">
+        <h3><span class="step-num">3</span> Liitä ja tallenna</h3>
+        <textarea class="paste-area" id="paste-input" placeholder="Name: ...&#10;Description: ...&#10;&#10;sana = word&#10;..." spellcheck="false"></textarea>
+        <div class="paste-error" id="paste-error"></div>
+        <div class="paste-actions">
+          <button class="btn-primary" onclick="saveNewSet()">Tallenna sanasto</button>
+          <button class="btn-secondary" onclick="goHome()">Peruuta</button>
+        </div>
+      </div>
+
+      <div class="share-note">
+        <strong>Haluatko jakaa kaikille?</strong> Omat sanastot tallentuvat vain tähän selaimeen. Jos haluat sanaston näkyvän kaikille käyttäjille, pyydä Claudea lisäämään se <code>vocab.js</code>-tiedostoon repositoryyn — Vercel päivittää sivun automaattisesti.
+      </div>
+    </div>
+  `);
+}
+
+function copyText(elId, btn) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  // grab text without the copy button label
+  const text = el.childNodes[0] ? el.childNodes[0].nodeValue : el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = "Kopioitu!";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1500);
+  });
+}
+
+function parseSetText(text) {
+  const rawLines = text.split(/\r?\n/);
+  let name = null;
+  let description = "";
+  const cards = [];
+  for (const raw of rawLines) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.startsWith("#") || line.startsWith("//")) continue;
+    const lower = line.toLowerCase();
+    if (lower.startsWith("name:")) { name = line.slice(line.indexOf(":") + 1).trim(); continue; }
+    if (lower.startsWith("description:") || lower.startsWith("desc:")) {
+      description = line.slice(line.indexOf(":") + 1).trim();
+      continue;
+    }
+    // card line: split on first " = " or "=" surrounded by anything
+    let sep = line.indexOf(" = ");
+    if (sep === -1) sep = line.indexOf("=");
+    if (sep === -1) {
+      throw new Error(`Rivi ilman erotinta "=": "${line}"`);
+    }
+    const fi = line.slice(0, sep).trim();
+    let rest = line.slice(sep + (line.substr(sep, 3) === " = " ? 3 : 1)).trim();
+    let hint = null;
+    const pipe = rest.indexOf(" | ");
+    if (pipe !== -1) {
+      hint = rest.slice(pipe + 3).trim();
+      rest = rest.slice(0, pipe).trim();
+    } else {
+      const p2 = rest.indexOf("|");
+      if (p2 !== -1) {
+        hint = rest.slice(p2 + 1).trim();
+        rest = rest.slice(0, p2).trim();
+      }
+    }
+    if (!fi || !rest) throw new Error(`Tyhjä termi rivillä: "${line}"`);
+    const card = { fi, en: rest };
+    if (hint) card.hint = hint;
+    cards.push(card);
+  }
+  if (!name) throw new Error('Lisää rivi: Name: sanaston nimi');
+  if (!cards.length) throw new Error('Ei sanapareja löytynyt');
+  return {
+    id: "custom_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7),
+    name,
+    description,
+    cards,
+    custom: true
+  };
+}
+
+function saveNewSet() {
+  const input = document.getElementById("paste-input");
+  const errEl = document.getElementById("paste-error");
+  errEl.classList.remove("show");
+  errEl.textContent = "";
+  if (!input || !input.value.trim()) {
+    errEl.textContent = "Liitä sanasto ensin tekstikenttään.";
+    errEl.classList.add("show");
+    return;
+  }
+  let set;
+  try {
+    set = parseSetText(input.value);
+  } catch (e) {
+    errEl.textContent = "Virhe: " + e.message;
+    errEl.classList.add("show");
+    return;
+  }
+  const customs = loadCustomSets();
+  customs.push(set);
+  saveCustomSets(customs);
+  goHome();
+}
+
+function deleteCustomSet(setId) {
+  const customs = loadCustomSets();
+  const set = customs.find(s => s.id === setId);
+  if (!set) return;
+  if (!confirm(`Poistetaanko "${set.name}"? Edistys nollautuu.`)) return;
+  saveCustomSets(customs.filter(s => s.id !== setId));
+  localStorage.removeItem(STORAGE_PREFIX + setId);
+  goHome();
+}
+
+// ============ FLASHCARDS ============
+let fcState = null;
+
+function startFlashcards() {
+  currentMode = "flashcards";
+  setCrumb([
+    { label: "Alkuun", onClick: "goHome()" },
+    { label: escapeHtml(currentSet.name), onClick: `openSet('${currentSet.id}')` },
+    { label: "Flashcards" }
+  ]);
+  const indices = [...currentSet.cards.keys()];
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  fcState = {
+    queue: indices,
+    idx: 0,
+    flipped: false,
+    knownCount: 0,
+    dontKnowCount: 0,
+    total: currentSet.cards.length
+  };
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  if (!fcState.queue.length) { renderFcDone(); return; }
+  if (fcState.idx >= fcState.queue.length) fcState.idx = 0;
+  if (fcState.idx < 0) fcState.idx = fcState.queue.length - 1;
+
+  const cardIdx = fcState.queue[fcState.idx];
+  const card = currentSet.cards[cardIdx];
+  fcState.flipped = false;
+  const pct = (fcState.knownCount / fcState.total) * 100;
+
+  render(`
+    <div class="fc-wrap">
+      <div class="fc-topbar">
+        <span>${fcState.idx + 1} / ${fcState.queue.length} jäljellä</span>
+        <div class="fc-pills">
+          <span class="fc-pill dont">${fcState.dontKnowCount} en osaa</span>
+          <span class="fc-pill know">${fcState.knownCount} osaan</span>
+        </div>
+      </div>
+      <div class="fc-progress"><div class="fill" style="width:${pct}%"></div></div>
+
+      <div class="fc-card" id="fc-card" onclick="flipCard()">
+        <div class="fc-inner">
+          <div class="fc-face front">
+            <div class="fc-label">Suomi</div>
+            <div class="fc-word">${escapeHtml(card.fi)}</div>
+            ${card.hint ? `<div class="fc-hint">${escapeHtml(card.hint)}</div>` : ''}
+            <div class="fc-tap">Klikkaa tai paina Space</div>
+          </div>
+          <div class="fc-face back">
+            <div class="fc-label">English</div>
+            <div class="fc-word">${escapeHtml(card.en)}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fc-controls">
+        <button class="fc-btn dont" onclick="event.stopPropagation(); markCard(false)">
+          <span class="arrow">←</span> En osaa <span class="key">A</span>
+        </button>
+        <button class="fc-btn know" onclick="event.stopPropagation(); markCard(true)">
+          Osaan <span class="key">D</span> <span class="arrow">→</span>
+        </button>
+      </div>
+
+      <div class="fc-hints">
+        <span><kbd>Space</kbd> käännä</span>
+        <span><kbd>A</kbd> en osaa &amp; eteenpäin</span>
+        <span><kbd>D</kbd> osaan &amp; eteenpäin</span>
+      </div>
+    </div>
+  `);
+}
+
+function flipCard() {
+  const card = document.getElementById("fc-card");
+  if (!card) return;
+  fcState.flipped = !fcState.flipped;
+  card.classList.toggle("flipped", fcState.flipped);
+}
+
+function markCard(known) {
+  if (!fcState || !fcState.queue.length) return;
+  const cardIdx = fcState.queue[fcState.idx];
+  if (known) {
+    fcState.knownCount++;
+    fcState.queue.splice(fcState.idx, 1);
+  } else {
+    fcState.dontKnowCount++;
+    fcState.queue.splice(fcState.idx, 1);
+    fcState.queue.push(cardIdx);
+  }
+  if (fcState.idx >= fcState.queue.length) fcState.idx = 0;
+  renderFlashcard();
+}
+
+function renderFcDone() {
+  render(`
+    <div class="round-done">
+      <div class="badge">Sessio valmis</div>
+      <h2>Hienoa työtä!</h2>
+      <p>Kävit kaikki ${fcState.total} korttia läpi.</p>
+      <div class="stats">
+        <div class="stat mastered">
+          <div class="num">${fcState.knownCount}</div>
+          <div class="lbl">Osattu</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-secondary" onclick="openSet('${currentSet.id}')">Takaisin</button>
+        <button class="btn-primary" onclick="startFlashcards()">Aloita uudestaan</button>
+      </div>
+    </div>
+  `);
+}
+
+// ============ LEARN ============
+// Bucket: 0 = new, 1 = learning (MC correct once), 2 = mastered (written correct)
+let learnState = null;
+
+const FOCUS_SIZE = 7;
+
+function startLearn() {
+  currentMode = "learn";
+  setCrumb([
+    { label: "Alkuun", onClick: "goHome()" },
+    { label: escapeHtml(currentSet.name), onClick: `openSet('${currentSet.id}')` },
+    { label: "Learn" }
+  ]);
+  const progress = loadProgress(currentSet.id);
+  const cards = currentSet.cards.map((c, i) => ({
+    idx: i,
+    bucket: (progress[getCardKey(c)] || {}).bucket || 0
+  }));
+  learnState = {
+    progress,
+    cards,
+    round: 1,
+    focusSet: [],     // indices of cards currently being practiced
+    queue: [],        // upcoming tasks {cardIdx, type}
+    lastAsked: null,
+    current: null,
+    awaitingNext: false
+  };
+  startRound();
+}
+
+function startRound() {
+  learnState.focusSet = [];
+  learnState.queue = [];
+  refillFocus();
+  if (!learnState.focusSet.length) { renderLearnDone(); return; }
+  // Queue initial task for each focus card
+  learnState.focusSet.forEach(idx => enqueueCard(idx, false));
+  nextLearn();
+}
+
+function refillFocus() {
+  const inFocus = new Set(learnState.focusSet);
+  const candidates = learnState.cards
+    .filter(c => c.bucket < 2 && !inFocus.has(c.idx));
+  // Prefer cards already partially learned (bucket 1) to finish them, then bucket 0
+  candidates.sort((a, b) => b.bucket - a.bucket || Math.random() - 0.5);
+  while (learnState.focusSet.length < FOCUS_SIZE && candidates.length) {
+    learnState.focusSet.push(candidates.shift().idx);
+  }
+}
+
+function enqueueCard(idx, delayed = true) {
+  const card = learnState.cards.find(c => c.idx === idx);
+  if (!card) return;
+  const type = card.bucket === 0 ? "mc" : "written";
+  if (delayed && learnState.queue.length > 1) {
+    // Insert 2-4 positions ahead so same card doesn't repeat immediately
+    const minPos = Math.min(2, learnState.queue.length);
+    const maxPos = Math.min(4, learnState.queue.length);
+    const pos = minPos + Math.floor(Math.random() * (maxPos - minPos + 1));
+    learnState.queue.splice(pos, 0, { cardIdx: idx, type });
+  } else {
+    learnState.queue.push({ cardIdx: idx, type });
+  }
+}
+
+function nextLearn() {
+  // No more queue items: check if round is complete
+  if (!learnState.queue.length) {
+    if (!learnState.focusSet.length) {
+      // Focus cleared — try refill for round break
+      const anyLeft = learnState.cards.some(c => c.bucket < 2);
+      if (!anyLeft) { renderLearnDone(); return; }
+      renderRoundComplete();
+      return;
+    }
+    // Focus still has cards but queue empty — re-queue them
+    learnState.focusSet.forEach(idx => enqueueCard(idx, false));
+    // Shuffle the freshly-queued items
+    for (let i = learnState.queue.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [learnState.queue[i], learnState.queue[j]] = [learnState.queue[j], learnState.queue[i]];
+    }
+  }
+
+  // Pull next task, avoid same card as last
+  let task = learnState.queue.shift();
+  if (task.cardIdx === learnState.lastAsked && learnState.queue.length) {
+    learnState.queue.push(task);
+    task = learnState.queue.shift();
+  }
+  const card = currentSet.cards[task.cardIdx];
+  learnState.current = { task, card };
+  learnState.lastAsked = task.cardIdx;
+  learnState.awaitingNext = false;
+  if (task.type === "mc") renderMultipleChoice(card);
+  else renderWritten(card);
+}
+
+function renderProgressBar() {
+  const total = learnState.cards.length;
+  const mastered = learnState.cards.filter(c => c.bucket >= 2).length;
+  const learning = learnState.cards.filter(c => c.bucket === 1).length;
+  const masteredPct = (mastered / total) * 100;
+  const learningPct = ((mastered + learning) / total) * 100;
+  return `
+    <div class="learn-progress-bar">
+      <div class="fill-learning" style="width:${learningPct}%"></div>
+      <div class="fill" style="width:${masteredPct}%"></div>
+    </div>
+  `;
+}
+
+function renderTopbar() {
+  const learning = learnState.cards.filter(c => c.bucket === 1).length;
+  const mastered = learnState.cards.filter(c => c.bucket >= 2).length;
+  return `
+    <div class="learn-topbar">
+      <div class="learn-counts">
+        <span class="learn-count learning">Opettelussa <strong>${learning}</strong></span>
+        <span class="learn-count mastered">Hallittu <strong>${mastered}</strong></span>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:var(--text-muted)">${mastered} / ${learnState.cards.length}</span>
+    </div>
+    ${renderProgressBar()}
+  `;
+}
+
+function renderMultipleChoice(card) {
+  const allEn = currentSet.cards.map(c => c.en).filter(en => en !== card.en);
+  const wrongs = [];
+  const pool = [...allEn];
+  for (let i = 0; i < 3 && pool.length; i++) {
+    const j = Math.floor(Math.random() * pool.length);
+    wrongs.push(pool.splice(j, 1)[0]);
+  }
+  const options = [card.en, ...wrongs];
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
+  render(`
+    <div class="learn-wrap">
+      ${renderTopbar()}
+      <div class="learn-card">
+        <div class="learn-lbl">Käännä englanniksi</div>
+        <div class="learn-term">${escapeHtml(card.fi)}</div>
+        ${card.hint ? `<div class="learn-term-hint">${escapeHtml(card.hint)}</div>` : ''}
+        <div class="learn-divider"></div>
+        <div class="learn-choices-lbl">Valitse oikea vastaus</div>
+        <div class="learn-choices" id="learn-choices">
+          ${options.map((opt, i) => `
+            <button class="learn-choice" data-answer="${escapeAttr(opt)}" onclick="answerMC(this, '${escapeAttr(opt)}')">
+              <span class="num">${i + 1}</span>
+              <span>${escapeHtml(opt)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button class="dont-know-link" onclick="dontKnowMC()">En tiedä</button>
+      </div>
+    </div>
+  `);
+}
+
+function answerMC(btn, answer) {
+  if (learnState.awaitingNext) return;
+  learnState.awaitingNext = true;
+  const correct = learnState.current.card.en;
+  const isRight = answer === correct;
+  document.querySelectorAll('.learn-choice').forEach(b => {
+    b.classList.add('disabled');
+    const a = b.getAttribute('data-answer');
+    if (a === correct) b.classList.add(isRight ? 'correct' : 'reveal');
+    else if (b === btn) b.classList.add('wrong');
+  });
+  recordResult(isRight);
+  setTimeout(() => { if (learnState.awaitingNext) nextLearn(); }, isRight ? 800 : 1500);
+}
+
+function dontKnowMC() {
+  if (learnState.awaitingNext) return;
+  learnState.awaitingNext = true;
+  const correct = learnState.current.card.en;
+  document.querySelectorAll('.learn-choice').forEach(b => {
+    b.classList.add('disabled');
+    if (b.getAttribute('data-answer') === correct) b.classList.add('reveal');
+  });
+  recordResult(false);
+  setTimeout(() => { if (learnState.awaitingNext) nextLearn(); }, 1500);
+}
+
+function renderWritten(card) {
+  render(`
+    <div class="learn-wrap">
+      ${renderTopbar()}
+      <div class="learn-card">
+        <div class="learn-lbl">Kirjoita englanniksi</div>
+        <div class="learn-term">${escapeHtml(card.fi)}</div>
+        ${card.hint ? `<div class="learn-term-hint">${escapeHtml(card.hint)}</div>` : ''}
+        <div class="learn-divider"></div>
+        <div class="learn-input-row">
+          <input type="text" class="learn-input" id="learn-input"
+            placeholder="vastaus…"
+            autocomplete="off" autocapitalize="off" spellcheck="false" autocorrect="off">
+          <button class="btn-primary" id="learn-submit" onclick="submitWritten()">Tarkista</button>
+        </div>
+        <div class="learn-feedback" id="learn-feedback"></div>
+        <button class="dont-know-link" onclick="dontKnowWritten()">En tiedä</button>
+      </div>
+    </div>
+  `);
+  setTimeout(() => {
+    const inp = document.getElementById("learn-input");
+    if (inp) inp.focus();
+  }, 50);
+}
+
+function normalize(s) {
+  return (s || "").trim().toLowerCase()
+    .replace(/^to\s+/, "")
+    .replace(/[.,!?;:'"()]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function submitWritten() {
+  if (learnState.awaitingNext) { nextLearn(); return; }
+  const inp = document.getElementById("learn-input");
+  if (!inp || !inp.value.trim()) return;
+  const answer = normalize(inp.value);
+  const correctRaw = learnState.current.card.en;
+  const variants = correctRaw.split(/[\/,]/).map(normalize);
+  const isRight = variants.includes(answer);
+
+  inp.disabled = true;
+  inp.classList.add(isRight ? "correct" : "wrong");
+  const submitBtn = document.getElementById("learn-submit");
+  if (submitBtn) submitBtn.textContent = "Jatka";
+
+  const fb = document.getElementById("learn-feedback");
+  fb.className = "learn-feedback show " + (isRight ? "right" : "wrong");
+  fb.innerHTML = isRight
+    ? `<div class="verdict">Oikein</div>
+       <div class="correct-answer">${escapeHtml(correctRaw)}</div>
+       <div class="continue-hint">Paina Enter jatkaaksesi</div>`
+    : `<div class="verdict">Oikea vastaus</div>
+       <div class="correct-answer">${escapeHtml(correctRaw)}</div>
+       <div class="your-answer">Kirjoitit: <strong>${escapeHtml(inp.value)}</strong></div>
+       <div class="continue-hint">Paina Enter jatkaaksesi</div>`;
+
+  recordResult(isRight);
+  learnState.awaitingNext = true;
+}
+
+function dontKnowWritten() {
+  if (learnState.awaitingNext) return;
+  const inp = document.getElementById("learn-input");
+  if (inp) { inp.disabled = true; inp.classList.add("wrong"); }
+  const submitBtn = document.getElementById("learn-submit");
+  if (submitBtn) submitBtn.textContent = "Jatka";
+  const correctRaw = learnState.current.card.en;
+  const fb = document.getElementById("learn-feedback");
+  fb.className = "learn-feedback show wrong";
+  fb.innerHTML = `
+    <div class="verdict">Oikea vastaus</div>
+    <div class="correct-answer">${escapeHtml(correctRaw)}</div>
+    <div class="continue-hint">Paina Enter jatkaaksesi</div>`;
+  recordResult(false);
+  learnState.awaitingNext = true;
+}
+
+function recordResult(isRight) {
+  const task = learnState.current.task;
+  const card = learnState.current.card;
+  const key = getCardKey(card);
+  const prev = learnState.progress[key] || { bucket: 0 };
+  const liveCard = learnState.cards.find(c => c.idx === task.cardIdx);
+
+  if (isRight && task.type === "mc") {
+    // MC correct → promote to bucket 1, re-queue as written later
+    prev.bucket = Math.max(prev.bucket, 1);
+    if (liveCard) liveCard.bucket = prev.bucket;
+    enqueueCard(task.cardIdx, true);
+  } else if (isRight && task.type === "written") {
+    // Written correct → mastered, remove from focus set
+    prev.bucket = 2;
+    if (liveCard) liveCard.bucket = 2;
+    learnState.focusSet = learnState.focusSet.filter(i => i !== task.cardIdx);
+  } else {
+    // Wrong → drop to bucket 0, re-queue as MC
+    prev.bucket = 0;
+    if (liveCard) liveCard.bucket = 0;
+    enqueueCard(task.cardIdx, true);
+  }
+  prev.last = Date.now();
+  learnState.progress[key] = prev;
+  saveProgress(currentSet.id, learnState.progress);
+}
+
+function renderRoundComplete() {
+  const allMastered = learnState.cards.every(c => c.bucket >= 2);
+  if (allMastered) { renderLearnDone(); return; }
+  const learning = learnState.cards.filter(c => c.bucket === 1).length;
+  const mastered = learnState.cards.filter(c => c.bucket >= 2).length;
+  const remaining = learnState.cards.filter(c => c.bucket < 2).length;
+
+  render(`
+    <div class="round-done">
+      <div class="badge">Kierros ${learnState.round} valmis</div>
+      <h2>Hyvää työtä!</h2>
+      <p>${remaining} ${remaining === 1 ? 'termi' : 'termiä'} jäljellä — jatka eteenpäin.</p>
+      <div class="stats">
+        <div class="stat learning">
+          <div class="num">${learning}</div>
+          <div class="lbl">Opettelussa</div>
+        </div>
+        <div class="stat mastered">
+          <div class="num">${mastered}</div>
+          <div class="lbl">Hallittu</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-secondary" onclick="openSet('${currentSet.id}')">Lopeta</button>
+        <button class="btn-primary" onclick="nextRound()">Jatka harjoittelua</button>
+      </div>
+    </div>
+  `);
+}
+
+function nextRound() {
+  learnState.round++;
+  learnState.lastAsked = null;
+  startRound();
+}
+
+function renderLearnDone() {
+  render(`
+    <div class="round-done">
+      <div class="badge">Valmista!</div>
+      <h2>Kaikki termit hallittu</h2>
+      <p>Olet käynyt koko pakan läpi. Voit aloittaa uudestaan kerrataksesi.</p>
+      <div class="stats">
+        <div class="stat mastered">
+          <div class="num">${currentSet.cards.length}</div>
+          <div class="lbl">Hallittu</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-secondary" onclick="openSet('${currentSet.id}')">Takaisin</button>
+        <button class="btn-primary" onclick="resetLearnProgress()">Aloita alusta</button>
+      </div>
+    </div>
+  `);
+}
+
+function resetLearnProgress() {
+  if (!confirm("Nollataanko " + currentSet.name + " edistys?")) return;
+  localStorage.removeItem(STORAGE_PREFIX + currentSet.id);
+  startLearn();
+}
+
+// ============ KEYBOARD ============
+document.addEventListener("keydown", (e) => {
+  const tag = (e.target.tagName || "").toLowerCase();
+  const isTyping = tag === "input" || tag === "textarea";
+
+  if (currentMode === "learn") {
+    if (learnState && learnState.current && learnState.current.task.type === "mc" && !learnState.awaitingNext && !isTyping) {
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= 4) {
+        const btns = document.querySelectorAll('.learn-choice');
+        if (btns[n - 1]) { e.preventDefault(); btns[n - 1].click(); }
+      }
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (learnState && learnState.awaitingNext) nextLearn();
+      else if (learnState && learnState.current && learnState.current.task.type === "written") submitWritten();
+    }
+    return;
+  }
+
+  if (currentMode === "flashcards" && fcState) {
+    if (isTyping) return;
+    if (e.key === " ") { e.preventDefault(); flipCard(); }
+    else if (e.key === "a" || e.key === "A") { e.preventDefault(); markCard(false); }
+    else if (e.key === "d" || e.key === "D") { e.preventDefault(); markCard(true); }
+  }
+});
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+if (!window.VOCAB || !window.VOCAB.sets || !window.VOCAB.sets.length) {
+  document.getElementById("main").innerHTML = `
+    <div style="padding:80px 20px;text-align:center;color:var(--text-muted)">
+      <h2 style="font-size:24px;color:var(--text);margin-bottom:8px">Ei sanastoja</h2>
+      <p>Tarkista että <code>vocab.js</code> on samassa kansiossa.</p>
+    </div>`;
+} else {
+  goHome();
+}
+</script>
+</body>
+</html>
