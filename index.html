@@ -1383,11 +1383,13 @@ function startLearn() {
     progress,
     cards,
     round: 1,
-    focusSet: [],     // indices of cards currently being practiced
-    queue: [],        // upcoming tasks {cardIdx, type}
+    focusSet: [],          // indices of cards currently being practiced
+    queue: [],             // upcoming tasks {cardIdx, type}
     lastAsked: null,
     current: null,
-    awaitingNext: false
+    awaitingNext: false,
+    masteredThisRound: 0,  // counts masteries since last milestone
+    pendingRoundDone: false
   };
   startRound();
 }
@@ -1395,6 +1397,8 @@ function startLearn() {
 function startRound() {
   learnState.focusSet = [];
   learnState.queue = [];
+  learnState.masteredThisRound = 0;
+  learnState.pendingRoundDone = false;
   refillFocus();
   if (!learnState.focusSet.length) { renderLearnDone(); return; }
   // Queue initial task for each focus card
@@ -1408,9 +1412,13 @@ function refillFocus() {
     .filter(c => c.bucket < 2 && !inFocus.has(c.idx));
   // Prefer cards already partially learned (bucket 1) to finish them, then bucket 0
   candidates.sort((a, b) => b.bucket - a.bucket || Math.random() - 0.5);
+  const added = [];
   while (learnState.focusSet.length < FOCUS_SIZE && candidates.length) {
-    learnState.focusSet.push(candidates.shift().idx);
+    const idx = candidates.shift().idx;
+    learnState.focusSet.push(idx);
+    added.push(idx);
   }
+  return added;
 }
 
 function enqueueCard(idx, delayed = true) {
@@ -1429,16 +1437,22 @@ function enqueueCard(idx, delayed = true) {
 }
 
 function nextLearn() {
-  // No more queue items: check if round is complete
+  // Check if everything is done
+  const anyLeft = learnState.cards.some(c => c.bucket < 2);
+  if (!anyLeft) { renderLearnDone(); return; }
+
+  // Milestone: every FOCUS_SIZE masteries, show a checkpoint
+  if (learnState.pendingRoundDone) {
+    learnState.pendingRoundDone = false;
+    renderRoundComplete();
+    return;
+  }
+
+  // No more queue items: keep the session flowing
   if (!learnState.queue.length) {
-    if (!learnState.focusSet.length) {
-      // Focus cleared — try refill for round break
-      const anyLeft = learnState.cards.some(c => c.bucket < 2);
-      if (!anyLeft) { renderLearnDone(); return; }
-      renderRoundComplete();
-      return;
-    }
-    // Focus still has cards but queue empty — re-queue them
+    // Make sure focus is topped up (in case it shrunk)
+    refillFocus();
+    if (!learnState.focusSet.length) { renderLearnDone(); return; }
     learnState.focusSet.forEach(idx => enqueueCard(idx, false));
     // Shuffle the freshly-queued items
     for (let i = learnState.queue.length - 1; i > 0; i--) {
@@ -1650,6 +1664,14 @@ function recordResult(isRight) {
     prev.bucket = 2;
     if (liveCard) liveCard.bucket = 2;
     learnState.focusSet = learnState.focusSet.filter(i => i !== task.cardIdx);
+    learnState.masteredThisRound++;
+    // Immediately top up focus with fresh cards so hard cards never sit alone
+    const addedIdxs = refillFocus();
+    addedIdxs.forEach(idx => enqueueCard(idx, true));
+    // Milestone every FOCUS_SIZE masteries
+    if (learnState.masteredThisRound >= FOCUS_SIZE) {
+      learnState.pendingRoundDone = true;
+    }
   } else {
     // Wrong → drop to bucket 0, re-queue as MC
     prev.bucket = 0;
@@ -1694,7 +1716,15 @@ function renderRoundComplete() {
 function nextRound() {
   learnState.round++;
   learnState.lastAsked = null;
-  startRound();
+  learnState.masteredThisRound = 0;
+  learnState.pendingRoundDone = false;
+  // Keep current focusSet — hard cards from previous round carry over
+  refillFocus();
+  if (!learnState.focusSet.length) { renderLearnDone(); return; }
+  if (!learnState.queue.length) {
+    learnState.focusSet.forEach(idx => enqueueCard(idx, false));
+  }
+  nextLearn();
 }
 
 function renderLearnDone() {
