@@ -113,6 +113,127 @@ main {
 }
 .home-hero p { color: var(--text-muted); font-size: 16px; }
 
+/* HERO GALLERY */
+.hero-gallery {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  padding: 32px 0 44px;
+  margin-bottom: 24px;
+  perspective: 1400px;
+  min-height: 280px;
+}
+.hero-gallery::before {
+  content: "";
+  position: absolute;
+  inset: 10% 5% auto 5%;
+  height: 70%;
+  background: radial-gradient(ellipse at center, var(--primary-soft), transparent 65%);
+  filter: blur(40px);
+  z-index: 0;
+  pointer-events: none;
+  animation: heroGlow 6s ease-in-out infinite alternate;
+}
+@keyframes heroGlow {
+  from { opacity: 0.55; transform: scale(0.95); }
+  to { opacity: 0.95; transform: scale(1.05); }
+}
+
+.hero-photo {
+  position: relative;
+  width: 220px;
+  aspect-ratio: 4 / 5;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 0 40px rgba(66, 85, 255, 0.15);
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.45s ease,
+              filter 0.45s ease;
+  z-index: 1;
+  will-change: transform;
+}
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.45s ease;
+  filter: saturate(1.05) contrast(1.04);
+}
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.28) 48%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.hero-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(66, 85, 255, 0.6), rgba(255, 205, 31, 0.3), rgba(97, 196, 108, 0.45));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.hero-photo.p1 { transform: rotate(-7deg) translateY(8px); animation: float1 7s ease-in-out infinite; }
+.hero-photo.p2 { transform: rotate(2deg)  translateY(-12px) scale(1.06); animation: float2 6s ease-in-out infinite; z-index: 2; }
+.hero-photo.p3 { transform: rotate(6deg)  translateY(10px); animation: float3 8s ease-in-out infinite; }
+
+@keyframes float1 {
+  0%,100% { transform: rotate(-7deg) translateY(8px); }
+  50%     { transform: rotate(-5deg) translateY(-4px); }
+}
+@keyframes float2 {
+  0%,100% { transform: rotate(2deg) translateY(-12px) scale(1.06); }
+  50%     { transform: rotate(0deg) translateY(-22px) scale(1.06); }
+}
+@keyframes float3 {
+  0%,100% { transform: rotate(6deg) translateY(10px); }
+  50%     { transform: rotate(4deg) translateY(-2px); }
+}
+
+.hero-photo:hover {
+  animation-play-state: paused;
+  transform: rotate(0deg) translateY(-18px) scale(1.1);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 0 60px rgba(66, 85, 255, 0.45);
+  z-index: 5;
+}
+.hero-photo:hover::after { transform: translateX(120%); }
+.hero-photo:hover::before { opacity: 1; }
+.hero-photo:hover img { transform: scale(1.08); filter: saturate(1.15) contrast(1.08); }
+
+@media (max-width: 720px) {
+  .hero-gallery { gap: 8px; padding: 16px 0 24px; min-height: 200px; }
+  .hero-photo { width: 130px; border-radius: 14px; }
+  .hero-photo::before { border-radius: 14px; }
+}
+
 .sets-section h2 {
   font-size: 13px;
   font-weight: 700;
@@ -1019,6 +1140,11 @@ function renderHome() {
   }).join("");
 
   render(`
+    <div class="hero-gallery" id="hero-gallery">
+      <div class="hero-photo p1"><img src="img/hero-1.png" alt="" loading="lazy"></div>
+      <div class="hero-photo p2"><img src="img/hero-2.png" alt="" loading="lazy"></div>
+      <div class="hero-photo p3"><img src="img/hero-3.png" alt="" loading="lazy"></div>
+    </div>
     <div class="home-hero">
       <h1>Tervetuloa takaisin</h1>
       <p>Valitse pakka aloittaaksesi.</p>
@@ -1031,6 +1157,22 @@ function renderHome() {
       <div class="sets-grid">${setsHtml}</div>
     </div>
   `);
+  attachHeroTilt();
+}
+
+function attachHeroTilt() {
+  const photos = document.querySelectorAll('.hero-photo');
+  photos.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `rotate(0deg) translateY(-18px) scale(1.1) rotateY(${x * 18}deg) rotateX(${-y * 18}deg)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = '';
+    });
+  });
 }
 
 function openSet(setId) {
