@@ -1140,11 +1140,6 @@ function renderHome() {
   }).join("");
 
   render(`
-    <div class="hero-gallery" id="hero-gallery">
-      <div class="hero-photo p1"><img src="img/hero-1.png" alt="" loading="lazy"></div>
-      <div class="hero-photo p2"><img src="img/hero-2.png" alt="" loading="lazy"></div>
-      <div class="hero-photo p3"><img src="img/hero-3.png" alt="" loading="lazy"></div>
-    </div>
     <div class="home-hero">
       <h1>Tervetuloa takaisin</h1>
       <p>Valitse pakka aloittaaksesi.</p>
@@ -1157,7 +1152,6 @@ function renderHome() {
       <div class="sets-grid">${setsHtml}</div>
     </div>
   `);
-  attachHeroTilt();
 }
 
 function attachHeroTilt() {
