@@ -306,6 +306,28 @@ main {
   margin-bottom: 4px;
 }
 .mode-header .sub { color: var(--text-muted); font-size: 15px; }
+.direction-toggle {
+  display: inline-flex;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.dir-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.dir-btn:hover { color: var(--text); }
+.dir-btn.active { background: var(--primary); color: #fff; }
 .mode-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1080,12 +1102,32 @@ function getAllSets() {
   return [...builtin, ...loadCustomSets()];
 }
 
+const DIRECTION_KEY = "sanasto_direction_v1";
+function getDirection() {
+  return localStorage.getItem(DIRECTION_KEY) === "en-fi" ? "en-fi" : "fi-en";
+}
+function setDirection(dir) {
+  localStorage.setItem(DIRECTION_KEY, dir === "en-fi" ? "en-fi" : "fi-en");
+}
+function promptLang(card) { return getDirection() === "en-fi" ? card.en : card.fi; }
+function answerLang(card) { return getDirection() === "en-fi" ? card.fi : card.en; }
+function promptLabel() { return getDirection() === "en-fi" ? "English" : "Suomi"; }
+function answerLabel() { return getDirection() === "en-fi" ? "Suomi" : "English"; }
+
+function progressStorageKey(setId) {
+  return STORAGE_PREFIX + setId + (getDirection() === "en-fi" ? "::en-fi" : "");
+}
+function clearAllProgress(setId) {
+  localStorage.removeItem(STORAGE_PREFIX + setId);
+  localStorage.removeItem(STORAGE_PREFIX + setId + "::en-fi");
+}
+
 function loadProgress(setId) {
-  try { const raw = localStorage.getItem(STORAGE_PREFIX + setId); return raw ? JSON.parse(raw) : {}; }
+  try { const raw = localStorage.getItem(progressStorageKey(setId)); return raw ? JSON.parse(raw) : {}; }
   catch { return {}; }
 }
 function saveProgress(setId, data) {
-  localStorage.setItem(STORAGE_PREFIX + setId, JSON.stringify(data));
+  localStorage.setItem(progressStorageKey(setId), JSON.stringify(data));
 }
 function getCardKey(card) { return card.fi + "::" + card.en; }
 
@@ -1179,10 +1221,15 @@ function openSet(setId) {
   ]);
   const progress = loadProgress(currentSet.id);
   const hasProgress = Object.keys(progress).length > 0;
+  const dir = getDirection();
   render(`
     <div class="mode-header">
       <h1>${escapeHtml(currentSet.name)}</h1>
       <div class="sub">${currentSet.cards.length} termiä · valitse opiskelutila</div>
+    </div>
+    <div class="direction-toggle">
+      <button class="dir-btn ${dir === 'fi-en' ? 'active' : ''}" onclick="chooseDirection('fi-en')">Suomi → English</button>
+      <button class="dir-btn ${dir === 'en-fi' ? 'active' : ''}" onclick="chooseDirection('en-fi')">English → Suomi</button>
     </div>
     <div class="mode-grid">
       <div class="mode-card" onclick="startFlashcards()">
@@ -1206,11 +1253,16 @@ function openSet(setId) {
   `);
 }
 
+function chooseDirection(dir) {
+  setDirection(dir);
+  openSet(currentSet.id);
+}
+
 function resetSetProgress(setId) {
   const set = getAllSets().find(s => s.id === setId);
   if (!set) return;
   if (!confirm("Nollataanko \"" + set.name + "\" Learn-edistys? Aloitat seuraavalla kerralla taas monivalinnoilla.")) return;
-  localStorage.removeItem(STORAGE_PREFIX + setId);
+  clearAllProgress(setId);
   openSet(setId);
 }
 
@@ -1371,7 +1423,7 @@ function deleteCustomSet(setId) {
   if (!set) return;
   if (!confirm(`Poistetaanko "${set.name}"? Edistys nollautuu.`)) return;
   saveCustomSets(customs.filter(s => s.id !== setId));
-  localStorage.removeItem(STORAGE_PREFIX + setId);
+  clearAllProgress(setId);
   goHome();
 }
 
@@ -1425,14 +1477,14 @@ function renderFlashcard() {
       <div class="fc-card" id="fc-card" onclick="flipCard()">
         <div class="fc-inner">
           <div class="fc-face front">
-            <div class="fc-label">Suomi</div>
-            <div class="fc-word">${escapeHtml(card.fi)}</div>
+            <div class="fc-label">${promptLabel()}</div>
+            <div class="fc-word">${escapeHtml(promptLang(card))}</div>
             ${card.hint ? `<div class="fc-hint">${escapeHtml(card.hint)}</div>` : ''}
             <div class="fc-tap">Klikkaa tai paina Space</div>
           </div>
           <div class="fc-face back">
-            <div class="fc-label">English</div>
-            <div class="fc-word">${escapeHtml(card.en)}</div>
+            <div class="fc-label">${answerLabel()}</div>
+            <div class="fc-word">${escapeHtml(answerLang(card))}</div>
           </div>
         </div>
       </div>
@@ -1641,14 +1693,14 @@ function renderTopbar() {
 }
 
 function renderMultipleChoice(card) {
-  const allEn = currentSet.cards.map(c => c.en).filter(en => en !== card.en);
+  const allAnswers = currentSet.cards.map(c => answerLang(c)).filter(a => a !== answerLang(card));
   const wrongs = [];
-  const pool = [...allEn];
+  const pool = [...allAnswers];
   for (let i = 0; i < 3 && pool.length; i++) {
     const j = Math.floor(Math.random() * pool.length);
     wrongs.push(pool.splice(j, 1)[0]);
   }
-  const options = [card.en, ...wrongs];
+  const options = [answerLang(card), ...wrongs];
   for (let i = options.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [options[i], options[j]] = [options[j], options[i]];
@@ -1658,8 +1710,8 @@ function renderMultipleChoice(card) {
     <div class="learn-wrap">
       ${renderTopbar()}
       <div class="learn-card">
-        <div class="learn-lbl">Käännä englanniksi</div>
-        <div class="learn-term">${escapeHtml(card.fi)}</div>
+        <div class="learn-lbl">Käännä ${getDirection() === 'en-fi' ? 'suomeksi' : 'englanniksi'}</div>
+        <div class="learn-term">${escapeHtml(promptLang(card))}</div>
         ${card.hint ? `<div class="learn-term-hint">${escapeHtml(card.hint)}</div>` : ''}
         <div class="learn-divider"></div>
         <div class="learn-choices-lbl">Valitse oikea vastaus</div>
@@ -1680,7 +1732,7 @@ function renderMultipleChoice(card) {
 function answerMC(btn, answer) {
   if (learnState.awaitingNext) return;
   learnState.awaitingNext = true;
-  const correct = learnState.current.card.en;
+  const correct = answerLang(learnState.current.card);
   const isRight = answer === correct;
   document.querySelectorAll('.learn-choice').forEach(b => {
     b.classList.add('disabled');
@@ -1695,7 +1747,7 @@ function answerMC(btn, answer) {
 function dontKnowMC() {
   if (learnState.awaitingNext) return;
   learnState.awaitingNext = true;
-  const correct = learnState.current.card.en;
+  const correct = answerLang(learnState.current.card);
   document.querySelectorAll('.learn-choice').forEach(b => {
     b.classList.add('disabled');
     if (b.getAttribute('data-answer') === correct) b.classList.add('reveal');
@@ -1709,8 +1761,8 @@ function renderWritten(card) {
     <div class="learn-wrap">
       ${renderTopbar()}
       <div class="learn-card">
-        <div class="learn-lbl">Kirjoita englanniksi</div>
-        <div class="learn-term">${escapeHtml(card.fi)}</div>
+        <div class="learn-lbl">Kirjoita ${getDirection() === 'en-fi' ? 'suomeksi' : 'englanniksi'}</div>
+        <div class="learn-term">${escapeHtml(promptLang(card))}</div>
         ${card.hint ? `<div class="learn-term-hint">${escapeHtml(card.hint)}</div>` : ''}
         <div class="learn-divider"></div>
         <div class="learn-input-row">
@@ -1742,7 +1794,7 @@ function submitWritten() {
   const inp = document.getElementById("learn-input");
   if (!inp || !inp.value.trim()) return;
   const answer = normalize(inp.value);
-  const correctRaw = learnState.current.card.en;
+  const correctRaw = answerLang(learnState.current.card);
   const variants = correctRaw.split(/[\/,]/).map(normalize);
   const isRight = variants.includes(answer);
 
@@ -1772,7 +1824,7 @@ function dontKnowWritten() {
   if (inp) { inp.disabled = true; inp.classList.add("wrong"); }
   const submitBtn = document.getElementById("learn-submit");
   if (submitBtn) submitBtn.textContent = "Jatka";
-  const correctRaw = learnState.current.card.en;
+  const correctRaw = answerLang(learnState.current.card);
   const fb = document.getElementById("learn-feedback");
   fb.className = "learn-feedback show wrong";
   fb.innerHTML = `
@@ -1885,7 +1937,7 @@ function renderLearnDone() {
 
 function resetLearnProgress() {
   if (!confirm("Nollataanko " + currentSet.name + " edistys?")) return;
-  localStorage.removeItem(STORAGE_PREFIX + currentSet.id);
+  clearAllProgress(currentSet.id);
   startLearn();
 }
 
