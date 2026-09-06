@@ -1115,7 +1115,7 @@ function promptLabel() { return getDirection() === "en-fi" ? "English" : "Suomi"
 function answerLabel() { return getDirection() === "en-fi" ? "Suomi" : "English"; }
 
 function progressStorageKey(setId) {
-  return STORAGE_PREFIX + setId + (getDirection() === "en-fi" ? "::en-fi" : "");
+  return STORAGE_PREFIX + setId;
 }
 function clearAllProgress(setId) {
   localStorage.removeItem(STORAGE_PREFIX + setId);
@@ -1123,8 +1123,23 @@ function clearAllProgress(setId) {
 }
 
 function loadProgress(setId) {
-  try { const raw = localStorage.getItem(progressStorageKey(setId)); return raw ? JSON.parse(raw) : {}; }
-  catch { return {}; }
+  // Progress is per card pair, not per translation direction — merge in any
+  // legacy direction-specific data (from before both directions shared one key),
+  // keeping the furthest-along bucket for each card.
+  let merged = {};
+  try { merged = JSON.parse(localStorage.getItem(progressStorageKey(setId)) || "{}"); } catch { merged = {}; }
+  let legacy = {};
+  try { legacy = JSON.parse(localStorage.getItem(STORAGE_PREFIX + setId + "::en-fi") || "{}"); } catch { legacy = {}; }
+  let changed = false;
+  for (const key in legacy) {
+    const a = merged[key], b = legacy[key];
+    if (!a || (b.bucket || 0) > (a.bucket || 0)) { merged[key] = b; changed = true; }
+  }
+  if (changed) {
+    localStorage.setItem(progressStorageKey(setId), JSON.stringify(merged));
+    localStorage.removeItem(STORAGE_PREFIX + setId + "::en-fi");
+  }
+  return merged;
 }
 function saveProgress(setId, data) {
   localStorage.setItem(progressStorageKey(setId), JSON.stringify(data));
@@ -1384,6 +1399,12 @@ function parseSetText(text) {
   }
   if (!name) throw new Error('Lisää rivi: Name: sanaston nimi');
   if (!cards.length) throw new Error('Ei sanapareja löytynyt');
+  const seen = new Map();
+  for (const c of cards) {
+    const key = c.fi + "::" + c.en;
+    if (seen.has(key)) throw new Error(`Sanapari "${c.fi} = ${c.en}" on liitetty kahdesti (riveillä ${seen.get(key)} ja ${cards.indexOf(c) + 1}). Poista toinen ennen tallennusta.`);
+    seen.set(key, cards.indexOf(c) + 1);
+  }
   return {
     id: "custom_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7),
     name,
@@ -1840,18 +1861,25 @@ function recordResult(isRight) {
   const card = learnState.current.card;
   const key = getCardKey(card);
   const prev = learnState.progress[key] || { bucket: 0 };
-  const liveCard = learnState.cards.find(c => c.idx === task.cardIdx);
+  // A pasted set can contain the same fi/en pair twice (e.g. merged from two
+  // batches). Treat every card index sharing this key as the same word so
+  // mastering one doesn't leave a duplicate behind to reappear as "new".
+  const sameKeyCards = learnState.cards.filter(c => getCardKey(currentSet.cards[c.idx]) === key);
+  const sameKeyIdxs = new Set(sameKeyCards.map(c => c.idx));
 
   if (isRight && task.type === "mc") {
     // MC correct → promote to bucket 1, re-queue as written later
     prev.bucket = Math.max(prev.bucket, 1);
-    if (liveCard) liveCard.bucket = prev.bucket;
+    sameKeyCards.forEach(c => c.bucket = prev.bucket);
     enqueueCard(task.cardIdx, true);
+    // Any duplicate index still waiting in the queue is now redundant
+    learnState.queue = learnState.queue.filter(t => t.cardIdx === task.cardIdx || !sameKeyIdxs.has(t.cardIdx));
   } else if (isRight && task.type === "written") {
     // Written correct → mastered, remove from focus set
     prev.bucket = 2;
-    if (liveCard) liveCard.bucket = 2;
-    learnState.focusSet = learnState.focusSet.filter(i => i !== task.cardIdx);
+    sameKeyCards.forEach(c => c.bucket = 2);
+    learnState.focusSet = learnState.focusSet.filter(i => !sameKeyIdxs.has(i));
+    learnState.queue = learnState.queue.filter(t => !sameKeyIdxs.has(t.cardIdx));
     learnState.masteredThisRound++;
     // Immediately top up focus with fresh cards so hard cards never sit alone
     const addedIdxs = refillFocus();
@@ -1863,8 +1891,9 @@ function recordResult(isRight) {
   } else {
     // Wrong → drop to bucket 0, re-queue as MC
     prev.bucket = 0;
-    if (liveCard) liveCard.bucket = 0;
+    sameKeyCards.forEach(c => c.bucket = 0);
     enqueueCard(task.cardIdx, true);
+    learnState.queue = learnState.queue.filter(t => t.cardIdx === task.cardIdx || !sameKeyIdxs.has(t.cardIdx));
   }
   prev.last = Date.now();
   learnState.progress[key] = prev;
