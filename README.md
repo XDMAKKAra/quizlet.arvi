@@ -3,8 +3,8 @@
 A Finnish→English vocabulary trainer with no login, no backend and no build step. Two
 study modes:
 
-- **Flashcards** — flip through a set at your own pace.
-- **Learn** — every term moves through three buckets: new → learning (answered
+- **Flashcards**: flip through a set at your own pace.
+- **Learn**: every term moves through three buckets: new → learning (answered
   correctly as multiple choice) → mastered (typed out correctly from memory). A term
   you get wrong is requeued two to four cards ahead, so it comes back while it is still
   fresh instead of at the end of the deck. The set is done when everything is mastered.
@@ -14,7 +14,7 @@ their own sets without an account. The whole app is one HTML file plus a data fi
 
 ## How to add a new vocab set
 
-### Option A — In the browser (private to your device)
+### Option A: in the browser (private to your device)
 
 1. Click **+ Lisää sanasto** on the home page.
 2. Paste your set using this format:
@@ -32,7 +32,7 @@ juosta = run | verb
 
 3. Click **Tallenna sanasto**. The set appears immediately on home and is saved in your browser only.
 
-### Option B — Share with everyone (committed to the repo)
+### Option B: share with everyone (committed to the repo)
 
 Add the set to `vocab.js` as a `{ id, name, description, cards: [{ fi, en, hint? }] }`
 object and push. Vercel redeploys automatically.
