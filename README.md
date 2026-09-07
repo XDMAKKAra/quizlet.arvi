@@ -1,6 +1,16 @@
 # Sanasto
 
-A simple, public, no-login Finnish→English vocabulary trainer (Flashcards + Learn mode). Progress is saved per device in `localStorage`. Anyone can visit, study, and add their own sets.
+A Finnish→English vocabulary trainer with no login, no backend and no build step. Two
+study modes:
+
+- **Flashcards** — flip through a set at your own pace.
+- **Learn** — every term moves through three buckets: new → learning (answered
+  correctly as multiple choice) → mastered (typed out correctly from memory). A term
+  you get wrong is requeued two to four cards ahead, so it comes back while it is still
+  fresh instead of at the end of the deck. The set is done when everything is mastered.
+
+Progress is stored per device in `localStorage`, so anyone can open it, study, and add
+their own sets without an account. The whole app is one HTML file plus a data file.
 
 ## How to add a new vocab set
 
@@ -24,11 +34,8 @@ juosta = run | verb
 
 ### Option B — Share with everyone (committed to the repo)
 
-If you want a set to appear for every visitor, ask Claude to add it to `vocab.js` in this repo. Vercel auto-deploys the change.
-
-**Prompt to give Claude** along with your raw vocab:
-
-> Add this vocabulary as a new set in `vocab.js`. Use `{ fi, en, hint? }` shape, give it a sensible `id`, `name`, and `description`. Then commit and push so Vercel redeploys.
+Add the set to `vocab.js` as a `{ id, name, description, cards: [{ fi, en, hint? }] }`
+object and push. Vercel redeploys automatically.
 
 ## Format rules
 
@@ -40,7 +47,7 @@ If you want a set to appear for every visitor, ask Claude to add it to `vocab.js
 
 ## Tech
 
-- Pure static site: `index.html` + `vocab.js`. No build step.
+- Pure static site: `index.html` + `vocab.js`. No framework, no bundler, no build step.
 - Progress: `localStorage` per set id, key prefix `sanasto_v2_`.
 - Custom sets: `localStorage` key `sanasto_custom_sets_v1`.
 - Hosted free on Vercel (Hobby plan).
