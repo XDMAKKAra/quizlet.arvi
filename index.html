@@ -1293,7 +1293,7 @@ koira = dog
 juosta = run | verb
 talo = house`;
 
-const CLAUDE_PROMPT = `Format this vocabulary into Sanasto paste format:
+const AI_PROMPT = `Format this vocabulary into Sanasto paste format:
 
 - One pair per line: \`fi term = en translation\`
 - Optional hint after a pipe: \`fi = en | hint\`
@@ -1322,9 +1322,9 @@ function renderAddSet() {
       </div>
 
       <div class="format-card">
-        <h3><span class="step-num">2</span> Pyydä Claudea muotoilemaan</h3>
+        <h3><span class="step-num">2</span> Pyydä tekoälyä muotoilemaan</h3>
         <p>Jos sanastosi on järjestämätön, kopioi tämä kehote ja liitä raakasanasto perään:</p>
-        <pre id="prompt-block">${escapeHtml(CLAUDE_PROMPT)}<button class="copy-btn" onclick="copyText('prompt-block', this)">Kopioi</button></pre>
+        <pre id="prompt-block">${escapeHtml(AI_PROMPT)}<button class="copy-btn" onclick="copyText('prompt-block', this)">Kopioi</button></pre>
       </div>
 
       <div class="format-card">
@@ -1338,7 +1338,7 @@ function renderAddSet() {
       </div>
 
       <div class="share-note">
-        <strong>Haluatko jakaa kaikille?</strong> Omat sanastot tallentuvat vain tähän selaimeen. Jos haluat sanaston näkyvän kaikille käyttäjille, pyydä Claudea lisäämään se <code>vocab.js</code>-tiedostoon repositoryyn — Vercel päivittää sivun automaattisesti.
+        <strong>Haluatko jakaa kaikille?</strong> Omat sanastot tallentuvat vain tähän selaimeen. Jos haluat sanaston näkyvän kaikille, lisää se <code>vocab.js</code>-tiedostoon repositoryssa. Vercel päivittää sivun automaattisesti.
       </div>
     </div>
   `);
